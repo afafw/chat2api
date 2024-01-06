@@ -299,11 +299,25 @@ func Completions(r *ghttp.Request) {
 	}
 	// ChatReq.Dump()
 	// 请求openai
-	resp, err := g.Client().SetHeaderMap(g.MapStrStr{
+	headers := g.MapStrStr{
 		"Authorization": "Bearer " + token,
 		"Content-Type":  "application/json",
 		// "authkey":       config.AUTHKEY,
-	}).Post(ctx, config.APISERVER, ChatReq.MustToJson())
+	}
+
+	if config.SESSIONTOKEN != "" {
+		headers["Cookie"] = "__Secure-next-auth.session-token=" + config.SESSIONTOKEN
+	}
+
+	if config.CFCLEARANCE != "" {
+		if _, ok := headers["Cookie"]; ok {
+			headers["Cookie"] += "; cf_clearance=" + config.CFCLEARANCE
+		} else {
+			headers["Cookie"] = "cf_clearance=" + config.CFCLEARANCE
+		}
+	}
+
+	resp, err := g.Client().SetHeaderMap(headers).Post(ctx, config.APISERVER, ChatReq.MustToJson())
 	if err != nil {
 		g.Log().Error(ctx, "g.Client().Post error: ", err)
 		r.Response.Status = 500

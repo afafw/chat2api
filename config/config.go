@@ -9,14 +9,16 @@ import (
 )
 
 var (
-	PORT        = 8080
-	APISERVER   = "http://chatproxy/backend-api/conversation"
-	APIHOST     = "http://chatproxy"
-	PASSMODE    = false
-	MAXTIME     = 0
-	NOPLUGINS   = false
-	KEEPHISTORY = false
-	AUTHKEY     = ""
+	PORT         = 8080
+	APISERVER    = "http://chatproxy/backend-api/conversation"
+	APIHOST      = "http://chatproxy"
+	PASSMODE     = false
+	MAXTIME      = 0
+	NOPLUGINS    = false
+	KEEPHISTORY  = false
+	AUTHKEY      = ""
+	SESSIONTOKEN = ""
+	CFCLEARANCE  = ""
 )
 
 func init() {
@@ -54,6 +56,14 @@ func init() {
 	if authKey != "" {
 		AUTHKEY = authKey
 	}
+	sessionToken := g.Cfg().MustGetWithEnv(ctx, "SESSIONTOKEN").String()
+	if sessionToken != "" {
+		SESSIONTOKEN = sessionToken
+	}
+	cfClearance := g.Cfg().MustGetWithEnv(ctx, "CFCLEARANCE").String()
+	if cfClearance != "" {
+		CFCLEARANCE = cfClearance
+	}
 
 	g.Log().Info(ctx, "PORT:", PORT)
 	g.Log().Info(ctx, "APISERVER:", APISERVER)
@@ -63,6 +73,8 @@ func init() {
 	g.Log().Info(ctx, "NOPLUGINS:", NOPLUGINS)
 	g.Log().Info(ctx, "KEEPHISTORY:", KEEPHISTORY)
 	g.Log().Info(ctx, "AUTHKEY:", AUTHKEY)
+	g.Log().Info(ctx, "SESSIONTOKEN:", SESSIONTOKEN)
+	g.Log().Info(ctx, "CFCLEARANCE:", CFCLEARANCE)
 }
 
 func SK2TOKEN(ctx g.Ctx, SK string) (token string) {
